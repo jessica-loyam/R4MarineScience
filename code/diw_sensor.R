@@ -1,6 +1,7 @@
 # Script to wrangle sensor data
 
 library(tidyverse)
+library(readxl)
 
 #  Load sensor data, 
 sensor_raw <- read_csv(here::here("data/workshop2/estuary_sonde_data.csv"))
@@ -35,6 +36,19 @@ sensor_daily <-
     mean_turbidity = mean(turbidity, na.rm = TRUE),
     .groups = "drop")
 
+
+#1.6 Wrangling out ecological signals using Palmer Penguins####
+  #activating the dataset
+# Install the data package (execute this command once in your console pane and then delete!)
+# install.packages("palmerpenguins")
+
+# Load the package data into active memory
+library(palmerpenguins)
+data("penguins")
+
+# Examine the structure of the dataset - always do this when loading a new dataset!
+glimpse(penguins) # tidyverse version (from dplyr package)
+str(penguins) # base R version
 
 
 
