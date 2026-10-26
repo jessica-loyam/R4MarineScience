@@ -1,0 +1,117 @@
+---
+title: "Workshop 1: Foundations of Marine Data Science"
+author: "Jessica Loyam"
+format: html
+editor: visual
+---
+
+# Data preparation 
+
+```{r}
+# Source workshop_1 script 
+source(here::here("code/Workshop_1.R"))
+```
+
+## Challenge 1: Summary Table 
+
+```{r}
+summary_table <- penguins %>%
+  group_by(species, island) %>%
+  summarise(
+    sample_size = n(), # Count total individuals per category
+    mean_mass_g = mean(body_mass_g, na.rm = TRUE), # Calculate mean ignoring missing cells
+    sd_mass_g = sd(body_mass_g, na.rm = TRUE) # Standard deviation calculation
+  )
+summary_table
+```
+
+## Challenge 2: Visualisation 
+
+```{r}
+penguins %>%
+  ggplot2::ggplot(aes(
+    x = species, 
+    y = body_mass_g, 
+    fill = island)) +
+  geom_boxplot(na.rm = TRUE) +
+  labs(
+    x = "Penguin Species", 
+    y = "Body Mass (g)", 
+    fill = "island"
+  ) +
+  theme_minimal()
+```
+
+## Example: Visualizing Mean Trends with Uncertainty
+
+```{r}
+mass_compare_plot <- penguins |>
+  group_by(species, island) |>
+  summarise(
+    mean_mass = mean(body_mass_g, na.rm = TRUE),
+    sd_mass = sd(body_mass_g, na.rm = TRUE),
+    n = n(),
+    .groups = "drop"
+  ) |>
+  ggplot(aes(x = species, y = mean_mass, colour = island)) +
+  geom_point(size = 3) +
+  geom_errorbar(aes(ymin = mean_mass - sd_mass,
+                    ymax = mean_mass + sd_mass), 
+                width = 0.2) +
+  labs(title = "Mean Body Mass by Species and Island",
+       subtitle = "Error bars represent standard deviation", 
+       y = "Mean Body Mass",
+       x = "Species") +
+  theme_minimal()
+
+mass_compare_plot
+```
+
+The species Gentoo have the highest mean body mass compared to the Adelle and Chinstrap penguins. Adelle and Chinstrap penguins displayed a small difference in their mean body mass, suggesting that the difference may not be statically significant. However, a statistical test would be required for confirmation.
+
+## Challenge: Creating a new plot - swapping commands 
+
+### Summary Table: 
+
+```{r}
+mass_summary_table_se <- penguins |>
+  group_by(species, island) |>
+  summarise(
+    mean_mass = mean(body_mass_g, na.rm = TRUE),
+    sd_mass = sd(body_mass_g, na.rm = TRUE),
+    n = sum(!is.na(body_mass_g)),
+    se_mass = sd_mass/sqrt(n),
+    .groups = "drop")
+
+mass_summary_table_se
+```
+
+### Visualization: 
+
+```{r}
+mass_compare_plot_se <- penguins |>
+  group_by(species, island) |>
+  summarise(
+    mean_mass = mean(body_mass_g, na.rm = TRUE),
+    sd_mass = sd(body_mass_g, na.rm = TRUE),
+    n = sum(!is.na(body_mass_g)),
+    se_mass = sd_mass/sqrt(n),
+    .groups = "drop"
+  ) |>
+  ggplot(aes(x = species, y = mean_mass, colour = island)) +
+  geom_point(size = 3) +
+  geom_errorbar(aes(ymin = mean_mass - se_mass,
+                    ymax = mean_mass + se_mass), 
+                width = 0.2) +
+  labs(title = "Mean Body Mass by Species and Island",
+       subtitle = "Error bars represent standard error", 
+       y = "Mean Body Mass",
+       x = "Species") +
+  theme_minimal()
+
+mass_compare_plot_se
+```
+
+The Adelle species are observed on all three islands, with small difference in body mass, ranging from 3600 g to 3800 g. Chinstrap are observed on Dream and display a similar mean body mass to Adelle penguins. However, the Gentoo penguins observed on Biscoe island, have a considerably higher mean body mass than the other two species. This suggests that a statistical test may reveal significant differences in mean body mass between Gentoo penguins and the other species.
+
+From an ecological perspective, Biscoe Island may provide favourable environmental conditions for Gentoo penguins. Alternatively, Gentoo penguins may naturally have a larger body size due to their biological characteristics.
