@@ -28,7 +28,7 @@ summary_table
 ## Challenge 2: Visualisation 
 
 ```{r}
-penguins %>%
+penguins_boxplot <- penguins %>%
   ggplot2::ggplot(aes(
     x = species, 
     y = body_mass_g, 
@@ -40,6 +40,8 @@ penguins %>%
     fill = "island"
   ) +
   theme_minimal()
+
+penguins_boxplot
 ```
 
 ## Example: Visualizing Mean Trends with Uncertainty
